@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Château AI — Wine Quality ANN Prediction Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 4C14.268 4 8 10.268 8 18C8 24.372 12.264 29.748 18 31.424V36H15C14.4477 36 14 36.4477 14 37C14 37.5523 14.4477 38 15 38H29C29.5523 38 30 37.5523 30 37C30 36.4477 29.5523 36 29 36H26V31.424C31.736 29.748 36 24.372 36 18C36 10.268 29.732 4 22 4ZM22 6C28.6274 6 34 11.3726 34 18C34 19.5 33.7 21 33.2 22.4C30.5 21.2 27 20.5 22 20.5C17 20.5 13.5 21.2 10.8 22.4C10.3 21 10 19.5 10 18C10 11.3726 15.3726 6 22 6Z" fill="url(#wineGoldGrad)"/>
+            <circle cx="22" cy="14" r="2.5" fill="#e6c875" />
+            <circle cx="16" cy="18" r="1.8" fill="#e6c875" />
+            <circle cx="28" cy="18" r="1.8" fill="#e6c875" />
+            <defs>
+              <linearGradient id="wineGoldGrad" x1="8" y1="4" x2="36" y2="38" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#f5e0a0"/>
+                <stop offset="0.5" stop-color="#d4af37"/>
+                <stop offset="1" stop-color="#9a2048"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title-wrap">
+            <h1 class="brand-title">CHÂTEAU AI</h1>
+            <span class="badge-ann">ANN v1.0</span>
+          </div>
+          <p class="brand-tagline">Deep Learning Enological Laboratory & Quality Classification</p>
+        </div>
+      </div>
+
+      <div class="header-status">
+        <div class="status-pill" id="statusPill">
+          <span class="status-dot pulsing" id="statusDot"></span>
+          <span class="status-text" id="statusText">Checking Model...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Preset Selection Bar -->
+    <section class="preset-section">
+      <div class="preset-label">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Instant Preset Profiles:</span>
+      </div>
+      <div class="preset-buttons">
+        <button type="button" class="preset-btn active" id="btnPresetReserve">
+          <span class="preset-icon">🍷</span> Grand Cru Reserve <span class="badge-tag">Good</span>
+        </button>
+        <button type="button" class="preset-btn" id="btnPresetTable">
+          <span class="preset-icon">🍇</span> Table Vintage <span class="badge-tag">Balanced</span>
+        </button>
+        <button type="button" class="preset-btn" id="btnPresetDeficient">
+          <span class="preset-icon">⚠️</span> Acetic Defect <span class="badge-tag tag-defect">Bad</span>
+        </button>
+        <button type="button" class="preset-btn preset-reset" id="btnResetDefault">
+          <span class="preset-icon">↺</span> Reset Averages
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Workspace -->
+    <main class="main-layout">
+      <!-- Input Form Card -->
+      <form class="params-form" id="wineForm">
+        <!-- Panel 1: Acidity & pH -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-icon icon-acidity">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            </div>
+            <div>
+              <h2 class="card-title">01 — Acidity & pH Balance</h2>
+              <p class="card-desc">Tartaric, acetic & citric acid composition</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- Fixed Acidity -->
+            <div class="field-group">
+              <div class="field-meta">
+                <label for="fixed_acidity">Fixed Acidity <span class="chem-sub">(Tartaric Acid)</span></label>
+                <span class="field-unit">g/dm³</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_fixed_acidity" min="4.0" max="16.0" step="0.1" value="7.4">
+                <input type="number" class="num-input" id="fixed_acidity" name="fixed_acidity" min="4.0" max="16.0" step="0.1" value="7.4" required>
+              </div>
+              <div class="field-hint">Range: 4.0 – 16.0 (Benchmark: ~8.3)</div>
+            </div>
+
+            <!-- Volatile Acidity -->
+            <div class="field-group">
+              <div class="field-meta">
+                <label for="volatile_acidity">Volatile Acidity <span class="chem-sub">(Acetic / Vinegar)</span></label>
+                <span class="field-unit">g/dm³</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_volatile_acidity" min="0.10" max="1.60" step="0.01" value="0.70">
+                <input type="number" class="num-input" id="volatile_acidity" name="volatile_acidity" min="0.10" max="1.60" step="0.01" value="0.70" required>
+              </div>
+              <div class="field-hint">High volatile acidity (>0.6) yields sharp vinegar odor</div>
+            </div>
+
+            <!-- Citric Acid -->
+            <div class="field-group">
+              <div class="field-meta">
+                <label for="citric_acid">Citric Acid <span class="chem-sub">(Freshness)</span></label>
+                <span class="field-unit">g/dm³</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_citric_acid" min="0.0" max="1.0" step="0.01" value="0.00">
+                <input type="number" class="num-input" id="citric_acid" name="citric_acid" min="0.0" max="1.0" step="0.01" value="0.00" required>
+              </div>
+              <div class="field-hint">Adds crispness & fruit freshness (0.0 – 1.0)</div>
+            </div>
+
+            <!-- pH -->
+            <div class="field-group">
+              <div class="field-meta">
+                <label for="pH">pH Level <span class="chem-sub">(Acidity scale)</span></label>
+                <span class="field-unit">pH</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_pH" min="2.8" max="4.0" step="0.01" value="3.51">
+                <input type="number" class="num-input" id="pH" name="pH" min="2.8" max="4.0" step="0.01" value="3.51" required>
+              </div>
+              <div class="field-hint">Ideal wine balance: 3.1 – 3.6 pH</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Body & Sugar -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-icon icon-body">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <div>
+              <h2 class="card-title">02 — Body & Fermentation</h2>
+              <p class="card-desc">Sugar, alcohol and physical gravity</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- Residual Sugar -->
+            <div class="field-group">
+              <div class="field-meta">
+                <label for="residual_sugar">Residual Sugar</label>
+                <span class="field-unit">g/dm³</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_residual_sugar" min="0.5" max="16.0" step="0.1" value="1.9">
+                <input type="number" class="num-input" id="residual_sugar" name="residual_sugar" min="0.5" max="16.0" step="0.1" value="1.9" required>
+              </div>
+              <div class="field-hint">Dry red wines typically have 1.0 – 3.0 g/dm³</div>
+            </div>
+
+            <!-- Chlorides -->
+            <div class="field-group">
+              <div class="field-meta">
+                <label for="chlorides">Chlorides <span class="chem-sub">(Sodium Chloride / Salt)</span></label>
+                <span class="field-unit">g/dm³</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_chlorides" min="0.01" max="0.60" step="0.001" value="0.076">
+                <input type="number" class="num-input" id="chlorides" name="chlorides" min="0.01" max="0.60" step="0.001" value="0.076" required>
+              </div>
+              <div class="field-hint">Salinity factor: Benchmark ~0.087</div>
+            </div>
+
+            <!-- Density -->
+            <div class="field-group">
+              <div class="field-meta">
+                <label for="density">Density</label>
+                <span class="field-unit">g/cm³</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_density" min="0.990" max="1.004" step="0.0001" value="0.9978">
+                <input type="number" class="num-input" id="density" name="density" min="0.990" max="1.004" step="0.0001" value="0.9978" required>
+              </div>
+              <div class="field-hint">Correlates with alcohol & sugar content</div>
+            </div>
+
+            <!-- Alcohol -->
+            <div class="field-group highlight-field">
+              <div class="field-meta">
+                <label for="alcohol">Alcohol Percentage <span class="badge-key">High Impact</span></label>
+                <span class="field-unit">% vol</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_alcohol" min="8.0" max="15.0" step="0.1" value="9.4">
+                <input type="number" class="num-input" id="alcohol" name="alcohol" min="8.0" max="15.0" step="0.1" value="9.4" required>
+              </div>
+              <div class="field-hint">Higher alcohol (>11%) strongly correlates with good rating</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 3: Preservatives & Sulphur -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-icon icon-sulphur">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+            </div>
+            <div>
+              <h2 class="card-title">03 — Preservation & SO₂</h2>
+              <p class="card-desc">Antioxidant & microbial stability</p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- Free SO2 -->
+            <div class="field-group">
+              <div class="field-meta">
+                <label for="free_sulfur_dioxide">Free Sulfur Dioxide <span class="chem-sub">(Free SO₂)</span></label>
+                <span class="field-unit">mg/dm³</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_free_sulfur_dioxide" min="1.0" max="72.0" step="1.0" value="11.0">
+                <input type="number" class="num-input" id="free_sulfur_dioxide" name="free_sulfur_dioxide" min="1.0" max="72.0" step="1.0" value="11.0" required>
+              </div>
+              <div class="field-hint">Prevents oxidation & microbial growth</div>
+            </div>
+
+            <!-- Total SO2 -->
+            <div class="field-group">
+              <div class="field-meta">
+                <label for="total_sulfur_dioxide">Total Sulfur Dioxide <span class="chem-sub">(Total SO₂)</span></label>
+                <span class="field-unit">mg/dm³</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_total_sulfur_dioxide" min="6.0" max="289.0" step="1.0" value="34.0">
+                <input type="number" class="num-input" id="total_sulfur_dioxide" name="total_sulfur_dioxide" min="6.0" max="289.0" step="1.0" value="34.0" required>
+              </div>
+              <div class="field-hint">Excessive total SO2 (>100) causes pungent nose</div>
+            </div>
+
+            <!-- Sulphates -->
+            <div class="field-group highlight-field">
+              <div class="field-meta">
+                <label for="sulphates">Sulphates <span class="chem-sub">(Potassium Sulphate)</span></label>
+                <span class="field-unit">g/dm³</span>
+              </div>
+              <div class="field-inputs">
+                <input type="range" class="range-slider" id="slider_sulphates" min="0.3" max="2.0" step="0.01" value="0.56">
+                <input type="number" class="num-input" id="sulphates" name="sulphates" min="0.3" max="2.0" step="0.01" value="0.56" required>
+              </div>
+              <div class="field-hint">Wine additive: promotes crisp antimicrobial defense</div>
+            </div>
+
+            <!-- Action Buttons inside 3rd panel -->
+            <div class="form-actions">
+              <button type="submit" class="btn-predict" id="btnPredict">
+                <span class="btn-text">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                  Run Neural Assessment
+                </span>
+                <span class="spinner" id="btnSpinner"></span>
+              </button>
+              <div class="btn-hint">Shortcut: <kbd>Ctrl</kbd> + <kbd>Enter</kbd></div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Prediction & Analytics Result Area -->
+      <aside class="result-sidebar">
+        <!-- Results Card -->
+        <div class="glass-card result-card" id="resultCard">
+          <div class="result-header">
+            <span class="result-badge-label">ANN Prediction Output</span>
+            <span class="result-time" id="resultTimestamp">Ready</span>
+          </div>
+
+          <!-- Default Placeholder State -->
+          <div class="result-placeholder" id="resultPlaceholder">
+            <div class="placeholder-icon">🍷</div>
+            <h3>Vintage Ready for Analysis</h3>
+            <p>Adjust parameters or pick a preset, then click <strong>Run Neural Assessment</strong> to evaluate wine quality.</p>
+          </div>
+
+          <!-- Dynamic Result Display (Hidden initially) -->
+          <div class="result-content hidden" id="resultContent">
+            <!-- Verdict Hero -->
+            <div class="verdict-banner" id="verdictBanner">
+              <div class="verdict-icon-wrap" id="verdictIcon">
+                <!-- SVG injected dynamically -->
+              </div>
+              <div class="verdict-details">
+                <div class="verdict-title" id="verdictTitle">PREMIUM QUALITY</div>
+                <div class="verdict-subtitle" id="verdictTier">Grand Cru Reserve</div>
+              </div>
+            </div>
+
+            <!-- Probability Meter & Confidence -->
+            <div class="gauge-container">
+              <div class="gauge-labels">
+                <span class="gauge-name">Good Quality Probability</span>
+                <span class="gauge-value" id="gaugePct">0.0%</span>
+              </div>
+              <div class="gauge-track">
+                <div class="gauge-fill" id="gaugeFill" style="width: 0%"></div>
+              </div>
+              <div class="gauge-sub">
+                <span>Classification Confidence:</span>
+                <strong id="confidenceVal">0%</strong>
+              </div>
+            </div>
+
+            <!-- Enological Diagnostics -->
+            <div class="diagnostics-box">
+              <h4 class="diag-title">Sommelier Enological Notes:</h4>
+              <ul class="diag-list" id="diagList">
+                <!-- Populated via script -->
+              </ul>
+            </div>
+
+            <!-- Key Ratios Grid -->
+            <div class="metrics-grid" id="metricsGrid">
+              <div class="metric-chip">
+                <span class="m-label">Alcohol</span>
+                <span class="m-val" id="mAlcohol">--</span>
+              </div>
+              <div class="metric-chip">
+                <span class="m-label">pH</span>
+                <span class="m-val" id="mPH">--</span>
+              </div>
+              <div class="metric-chip">
+                <span class="m-label">Volatile Acid</span>
+                <span class="m-val" id="mVolatile">--</span>
+              </div>
+              <div class="metric-chip">
+                <span class="m-label">Sugar</span>
+                <span class="m-val" id="mSugar">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Architecture Card -->
+        <div class="glass-card model-info-card">
+          <div class="arch-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            <h3>Model Architecture & Metrics</h3>
+          </div>
+          <div class="arch-specs">
+            <div class="arch-row">
+              <span class="arch-label">Model Type</span>
+              <span class="arch-value highlight">Multilayer Perceptron (ANN)</span>
+            </div>
+            <div class="arch-row">
+              <span class="arch-label">Layer Pipeline</span>
+              <span class="arch-value font-mono">11 → Dense(16) → Dense(8) → Dense(1)</span>
+            </div>
+            <div class="arch-row">
+              <span class="arch-label">Activations</span>
+              <span class="arch-value font-mono">ReLU (Hidden) / Sigmoid (Output)</span>
+            </div>
+            <div class="arch-row">
+              <span class="arch-label">Optimizer & Loss</span>
+              <span class="arch-value font-mono">Adam / Binary Crossentropy</span>
+            </div>
+            <div class="arch-row">
+              <span class="arch-label">Pre-processor</span>
+              <span class="arch-value font-mono">Scikit-Learn StandardScaler</span>
+            </div>
+            <div class="arch-row">
+              <span class="arch-label">Backend Engine</span>
+              <span class="arch-value">FastAPI + TensorFlow Keras</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Château AI — Artificial Neural Network Wine Classification System &bull; Production Ready for Render</p>
+    </footer>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
